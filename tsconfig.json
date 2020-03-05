@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": false,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "lib": [
+      "es2017"
+    ],
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@shared.core": ["src/libs/shared/core"],
+      "@shared.all/*": ["src/libs/shared/*"],
+      "@modules.libs/*": ["src/modules.libs/*"],
+      "@libs/*": ["src/libs/*"],
+      "@repositories": ["src/repositories"],
+      "@models": ["src/libs/models"],
+    }
+  },
+  "exclude": ["node_modules"]
+}

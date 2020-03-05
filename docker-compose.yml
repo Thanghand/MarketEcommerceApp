@@ -1,0 +1,154 @@
+version: "3"
+
+services:
+  techno-food-nats-streaming:
+    image: nats-streaming
+    container_name: techno-food-nats-streaming
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    networks:
+      - techno-food-network
+    restart: always
+
+  techno-food-nginx:
+    image: techno-food-nginx
+    container_name: techno-food-nginx
+    restart: always
+    build:
+      dockerfile: dev.dockerfile
+      context: ./nginx
+    ports:
+      - "80:80"
+    networks:
+      - techno-food-network
+
+  techno-food-mongodb:
+    image: mongo
+    container_name: techno-food-mongodb
+    # environment:
+    ports:
+      - 27017:27017
+    networks:
+      - techno-food-network
+
+  techno-food-apps-api:
+    image: techno-food-apps-api
+    container_name: techno-food-apps-api
+    build:
+      context: ./
+      dockerfile: Dockerfile-v1-dev.dockerfile
+      args:
+        - app=technofood.app
+    depends_on:
+      - techno-food-mongodb
+    environment:
+      - APP=technofood.app
+      - NODE_ENV=dev
+    ports:
+      - "3000:3000"
+      - "6860:9229"
+    volumes:
+      - ./dist:/home/app
+      - ./uploads:/home/app/uploads
+      - ./package.json:/home/app/package.json
+      - ./node_modules:/home/app/node_modules
+      - ./tsconfig.json:/home/app/tsconfig.json
+      - ./nodemon.json:/home/app/nodemon.json
+      - ./tsconfig-paths-bootstrap.js:/home/app/tsconfig-paths-bootstrap.js
+      - ./.env:/home/app/.env
+      - ./.env.dev:/home/app/.env.dev
+    networks:
+      - techno-food-network
+
+  techno-food-files-api:
+    image: techno-food-files-api
+    container_name: techno-food-files-api
+    build:
+      context: ./
+      dockerfile: Dockerfile-v1-dev.dockerfile
+      args:
+        - app=files.app
+    volumes:
+      - ./dist:/home/app
+      - ./uploads:/home/app/uploads
+      - ./logos:/home/app/logos
+      - ./logos-base64:/home/app/logos-base64
+      - ./package.json:/home/app/package.json
+      - ./node_modules:/home/app/node_modules
+      - ./tsconfig.json:/home/app/tsconfig.json
+      - ./nodemon.json:/home/app/nodemon.json
+      - ./tsconfig-paths-bootstrap.js:/home/app/tsconfig-paths-bootstrap.js
+      - ./.env:/home/app/.env
+      - ./.env.dev:/home/app/.env.dev
+    environment:
+      - APP=files.app
+      - NODE_ENV=dev
+    ports:
+      - "3002:3000"
+      - "6862:9229"
+    networks:
+      - techno-food-network
+
+  gateway-apps-api:
+    image: gateway-apps-api
+    container_name: gateways-apps-api
+    build:
+      context: ./
+      dockerfile: Dockerfile-v1-dev.dockerfile
+      args:
+        - app=gateway.app
+    environment:
+      - APP=gateway.app
+      - NODE_ENV=dev
+    ports:
+      - "3001:3000"
+      - "6861:9229"
+    volumes:
+      - ./dist:/home/app
+      - ./package.json:/home/app/package.json
+      - ./node_modules:/home/app/node_modules
+      - ./tsconfig.json:/home/app/tsconfig.json
+      - ./nodemon.json:/home/app/nodemon.json
+      - ./tsconfig-paths-bootstrap.js:/home/app/tsconfig-paths-bootstrap.js
+      - ./.env:/home/app/.env
+      - ./.env.dev:/home/app/.env.dev
+    networks:
+      - techno-food-network
+    depends_on:
+      - techno-food-files-api
+      - techno-food-apps-api
+    # restart: always
+
+  workers-api:
+    image: workers-api
+    container_name: workers-api
+    build:
+      context: ./
+      dockerfile: Dockerfile-v1-dev.dockerfile
+      args:
+        - app=workers.app
+    volumes:
+      - ./dist:/home/app
+      - ./uploads:/home/app/uploads
+      - ./logos:/home/app/logos
+      - ./logos-base64:/home/app/logos-base64
+      - ./package.json:/home/app/package.json
+      - ./node_modules:/home/app/node_modules
+      - ./tsconfig.json:/home/app/tsconfig.json
+      - ./nodemon.json:/home/app/nodemon.json
+      - ./tsconfig-paths-bootstrap.js:/home/app/tsconfig-paths-bootstrap.js
+      - ./.env:/home/app/.env
+      - ./.env.dev:/home/app/.env.dev
+    environment:
+      - APP=workers.app
+      - NODE_ENV=dev
+    ports:
+      - "3003:3000"
+      - "6863:9229"
+    networks:
+      - techno-food-network
+
+networks:
+  techno-food-network:
+    driver: bridge

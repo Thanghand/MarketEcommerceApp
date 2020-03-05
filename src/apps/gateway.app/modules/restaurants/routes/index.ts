@@ -1,0 +1,1 @@
+export * from './restaurants.routes-v1.0.0';
