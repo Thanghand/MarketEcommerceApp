@@ -10,7 +10,8 @@ import {
     ClientOrderRepository,
     ClientInvoiceRepository, 
     ClientShoppingCartRepository,
-    ClientMembershipRepository} from '.';
+    ClientMembershipRepository,
+    ClientRatingRepository} from '.';
 import { ClientMembershipRuleRepository } from './membership/client-membership-rule.repository';
 import { ClientEmailRepository } from './email/client-email.repository';
 
@@ -28,6 +29,7 @@ const providers = [
     ClientMembershipRepository,
     ClientMembershipRuleRepository,
     ClientEmailRepository,
+    ClientRatingRepository
 ];
 
 @Module({
